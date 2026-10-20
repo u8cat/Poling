@@ -6,6 +6,9 @@ Email: zhu103@purdue.edu
 
 ===[ Installation ]===================================================
 
+NOTE: The instructions in this section describe the original 2015 setup
+(Yices 1), which no longer builds. See INSTALL for current instructions.
+
 ************************
 If you get Poling in a virtual machine, you can skip this step.
 ************************

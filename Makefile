@@ -4,6 +4,13 @@ export OCAMLC = ocamlc.opt -dtypes -rectypes
 #export OCAMLC = ocamlcp -g -p a -dtypes -rectypes
 export OCAMLOPT = ocamlopt.opt -dtypes -rectypes
 
+# Yices 2 SMT solver (see INSTALL).  "make yices" builds it from source
+# into external/yices2.  To use another installation, set YICES_DIR to a
+# directory containing include/yices.h and lib/libyices.*, e.g.
+#   make YICES_DIR=/usr/local
+YICES_VERSION = 2.7.0
+YICES_DIR = external/yices2
+
 INCLUDES = 
 
 PARSING = location.mli location.ml misc.mli misc.ml parsetree.mli parsetree.ml \
@@ -17,19 +24,31 @@ TOPLEVEL_SOURCES = $(PARSING) indpreds.mli indpreds.ml \
 	commands.mli commands.ml convert.mli convert.ml tycheck.mli tycheck.ml \
 	genarith.mli genarith.ml prover.mli prover.ml abstraction.mli abstraction.ml \
 	qualifier.mli qualifier.ml \
+	oyices_stubs.c oyices.mli oyices.ml \
 	theoremProverYices.ml theoremProver.ml \
 	specpool.mli specpool.ml \
 	symbsimp.mli symbsimp.ml mcpamain.ml
 
+# Since OCaml 5.0, str and unix live in their own subdirectories.
+STDLIB_DIRS = -I +str -I +unix
+
+YICES_FLAGS = CFLAGS="-I$(YICES_DIR)/include" \
+       LIBDIRS="$(YICES_DIR)/lib" \
+       CLIBS="yices gmp"
+
 MAIN = SOURCES="$(TOPLEVEL_SOURCES) main.ml" \
-       LIBS="str unix oyices" \
+       LIBS="str unix" \
+       OCAMLFLAGS="$(STDLIB_DIRS)" \
+       OCAMLLDFLAGS="$(STDLIB_DIRS)" \
+       $(YICES_FLAGS) \
        RESULT=poling.byte \
        TRASH="$(TRASH)"
 
 MAINOPT = SOURCES="$(TOPLEVEL_SOURCES) main.ml" \
-       LIBS="str unix oyices" \
-       OCAMLFLAGS="-I external/yices/lib/" \
-       OCAMLLDFLAGS="-cclib -loyices -cclib -lgmp -cclib -lyices -I external/yices/lib/" \
+       LIBS="str unix" \
+       OCAMLFLAGS="$(STDLIB_DIRS)" \
+       OCAMLLDFLAGS="$(STDLIB_DIRS)" \
+       $(YICES_FLAGS) \
        RESULT=poling \
        TRASH="$(TRASH)"
 
@@ -47,12 +66,17 @@ default: poling
 all: poling.byte poling
 
 .PHONY: poling.byte
-poling.byte:
+poling.byte: $(YICES_DIR)/include/yices.h
 	$(MAKE) -f $(OCAMLMAKEFILE) $(MAIN) debug-code
 
 .PHONY: poling
-poling:
+poling: $(YICES_DIR)/include/yices.h
 	$(MAKE) -f $(OCAMLMAKEFILE) $(MAINOPT) native-code
+
+$(YICES_DIR)/include/yices.h:
+	@echo "Yices 2 not found in $(YICES_DIR)." >&2
+	@echo "Run 'make yices' first, or set YICES_DIR (see INSTALL)." >&2
+	@exit 1
 
 .PHONY: poling-gui
 poling-gui:
@@ -87,10 +111,12 @@ test2: poling
 depend:
 	ocamldep $(INCLUDES) *.mli *.ml > .depend
 
-yiceslib:
-	mkdir -p external/yices/include/build; cd external/yices/include/build; $(MAKE) -f ../Makefile;
+.PHONY: yices
+yices:
+	sh external/build-yices2.sh $(YICES_VERSION)
 
-libs: yiceslib
+.PHONY: libs
+libs: yices
 
 dummy:
 

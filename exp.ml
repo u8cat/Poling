@@ -122,7 +122,7 @@ let rec equal_exp e1 e2 =
 	   | _ -> false)
     | Egrp (s1,n1,nel1) ->
 	(match e2 with Egrp (s2,n2,nel2) ->
-	   Pervasives.(=) s1 s2 && n1=n2 && equal_ie_list nel1 nel2
+	   Stdlib.(=) s1 s2 && n1=n2 && equal_ie_list nel1 nel2
 	   | _ -> false)
   end
 
@@ -140,7 +140,7 @@ and equal_ie_list el1 el2 = match el1,el2 with
       i1==i2 && equal_exp e1 e2 && equal_ie_list el1' el2'
 
 let compare_int (i1: int) (i2: int) =
-  Pervasives.compare i1 i2 
+  Stdlib.compare i1 i2 
 
 let compare_small_int x y =
   Obj.magic x - (Obj.magic y : int)

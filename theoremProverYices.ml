@@ -98,12 +98,16 @@ module YicesProver : PROVER =
   		if i = 0 then ()
   		else (f (); repeat_fn f (i-1))
 
+    (* Declarations are keyed on name and type: the same name can occur at
+       several types (e.g. variable next and field next), which Yices 1
+       silently accepted but Yices 2 rejects as ill-typed. *)
     let yicesVar me s ty =
+      let key = Printf.sprintf "%s:%d" s (ty : Y.yices_type :> int) in
       let decl = 
         do_memo me.d
         (fun () -> 
           let rv = Y.yices_mk_var_decl me.c s ty in
-            me.ds <- s::me.ds;rv) () s in
+            me.ds <- key::me.ds;rv) () key in
       Y.yices_mk_var_from_decl me.c decl
 
     let rec isconst = function
@@ -187,7 +191,8 @@ module YicesProver : PROVER =
 			| Predicate.Recpred (f, e) -> 
 				let t = me.t in
         let	tl = Array.make 1 t in
-        let ftype = Y.yices_mk_function_type me.c tl t in
+        (* A predicate: Yices 2 rejects int-valued terms used as formulas *)
+        let ftype = Y.yices_mk_function_type me.c tl (Y.yices_mk_type me.c "bool") in
         let (func, e') = (yicesVar me f ftype, yicesExp me e) in
         Y.yices_mk_app me.c func [|e'|]
 

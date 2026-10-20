@@ -420,7 +420,7 @@ let whether_query pool purepred returnpred concurr_st seq_st locals =
 					let vc = Predicate.Not (Predicate.And (completion, dabs_seq_st)) in
 					let result_2 = TheoremProver.implies pre vc in
 					(*let _ = Misc.pp "The checking result_2 is %b\n" result_2 in*)
-					(TheoremProver.finish (); result_1 & result_2)
+					(TheoremProver.finish (); result_1 && result_2)
 				else false
 			else false in
 			(*let _ = Misc.pp "============checked pool item==============\n" in*)
@@ -510,26 +510,26 @@ let check_by_t_descs loc precondition postcondition pool hp_launch t_descs g_fun
 						Predicate.map_fields
 							(fun x -> 
 								if (String.length x >= 4 && String.compare (String.sub x 0 4) "post" = 0) then
-									(Pervasives.string_of_int 1)
+									(Stdlib.string_of_int 1)
 								else x)
 							spec
 					else if (i = List.length spec_perm-1) then
 						Predicate.map_fields
 							(fun x -> 
 								if (String.length x >= 3 && String.compare (String.sub x 0 3) "pre" = 0) then
-									(Pervasives.string_of_int (List.length spec_perm-1))
+									(Stdlib.string_of_int (List.length spec_perm-1))
 								else x)
 							spec
 					else
 						Predicate.map_fields
 							(fun x -> 
 								if (String.length x >= 4 && String.compare (String.sub x 0 4) "post" = 0) then
-									(Pervasives.string_of_int (i+1))
+									(Stdlib.string_of_int (i+1))
 								else x)
 								(Predicate.map_fields
 								(fun x -> 
 								if (String.length x >= 3 && String.compare (String.sub x 0 3) "pre" = 0) then
-									(Pervasives.string_of_int i)
+									(Stdlib.string_of_int i)
 								else x)
 								spec) 
 					) spec_perm

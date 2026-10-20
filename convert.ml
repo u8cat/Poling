@@ -61,9 +61,9 @@ let rec convert_exp e = match e.pexp_desc with
   | Pexp_infix (op,e1,e2) -> 
       let ce1 = convert_exp e1 in 
       let ce2 = convert_exp e2 in 
-      if Pervasives.(=) op "+" then E.add ce1 ce2
-      else if Pervasives.(=) op "^" then E.xor [ce1;ce2]
-      else if Pervasives.(=) op "-" then E.sub ce1 ce2
+      if Stdlib.(=) op "+" then E.add ce1 ce2
+      else if Stdlib.(=) op "^" then E.xor [ce1;ce2]
+      else if Stdlib.(=) op "-" then E.sub ce1 ce2
       else assert false (*E.fun (sfn_of_string op) [ce1;ce2]*)
   | Pexp_cast(e1,_) -> convert_exp e1
   | Pexp_fun(i,el) -> convert_fun i (List.map convert_exp el) e.pexp_loc
@@ -88,9 +88,9 @@ let rec convert_exp_se rgnl e stmts = match e.pexp_desc with
   | Pexp_infix (op,e1,e2) -> 
       let (stmts, ce1) = convert_exp_se rgnl e1 stmts in 
       let (stmts, ce2) = convert_exp_se rgnl e2 stmts in 
-      (stmts, if Pervasives.(=) op "+" then E.add ce1 ce2
-              else if Pervasives.(=) op "^" then E.xor [ce1;ce2]
-              else if Pervasives.(=) op "-" then E.sub ce1 ce2
+      (stmts, if Stdlib.(=) op "+" then E.add ce1 ce2
+              else if Stdlib.(=) op "^" then E.xor [ce1;ce2]
+              else if Stdlib.(=) op "-" then E.sub ce1 ce2
 	      else assert false)
   | Pexp_cast(e1,_) -> convert_exp_se rgnl e1 stmts
   | Pexp_fun(i,el) -> 

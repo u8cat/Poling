@@ -200,7 +200,7 @@ let string_of_component s = component_arr.contents.(s)
 
 let string_of_field_component s =
   let s = string_of_component s in
-  assert(s <> "" && Pervasives.(=) (String.get s 0) '.');
+  assert(s <> "" && Stdlib.(=) (String.get s 0) '.');
   String.sub s 1 (String.length s - 1)
 
 let component_is_field s = 

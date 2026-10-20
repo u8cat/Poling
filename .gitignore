@@ -7,3 +7,10 @@
 *.svn-base
 *.quals
 *_instru.ml
+._d/
+._bcdi/
+._ncdi/
+parser.output
+/poling
+/poling.byte
+external/yices2/

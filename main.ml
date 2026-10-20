@@ -35,8 +35,8 @@ let _ =
   let re = Str.regexp_string "Display" in
   let cmp ((_,_,xd) as x) ((_,_,yd) as y) =
     let f x = try ignore (Str.search_forward re x 0); true with Not_found -> false in
-    let n = Pervasives.compare (f xd) (f yd) in if n <> 0 then n else
-    Pervasives.compare x y in
+    let n = Stdlib.compare (f xd) (f yd) in if n <> 0 then n else
+    Stdlib.compare x y in
 
   Arg.parse 
     (Arg.align (List.sort cmp speclist))
